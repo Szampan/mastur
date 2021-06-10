@@ -1,0 +1,9 @@
+# sE(), sA() sD(), sG()  - guitar string E, A, D, G
+# C,D,E,F,G,A,H,C - sound names
+
+
+sE(0) = E
+sE(3) = G
+
+sA(0) = sE(0 + 5)
+sA(n) = sE(n + 5)
