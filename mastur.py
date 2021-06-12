@@ -24,7 +24,7 @@ def strE(fret):
     return sound
 
 #w budowie:
-def bassString(name, fret):
+#def bassString(name, fret):
 
 #zrobić jeszcze losowanie strun
 

@@ -1,8 +1,9 @@
+
 #w budowie:
 
 sounds = ["a", "a#", "b", "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#"]
 
-def bassString(name, fret):
+def bassString(name, fret): # return a name of the sound assigned to a fret on the particular string
     if fret > 24:
         print("There are 24 frets!")
     else:
@@ -28,4 +29,4 @@ def bassString(name, fret):
             return 0
 
 
-print(bassString("e", 0))
+print(bassString("e", 1))
