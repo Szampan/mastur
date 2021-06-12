@@ -1,7 +1,8 @@
-
+import random
 #w budowie:
 
 sounds = ["a", "a#", "b", "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#"]
+bassStrings = ["e", "a", "d", "g"]
 
 def bassString(name, fret): # return a name of the sound assigned to a fret on the particular string
     if fret > 24:
@@ -29,4 +30,13 @@ def bassString(name, fret): # return a name of the sound assigned to a fret on t
             return 0
 
 
-print(bassString("e", 1))
+def randomStringAndSound():
+    x = random.choice(bassStrings)
+    y = random.choice(sounds)
+    return x, y
+
+#stringAndSound = "e", "a"
+
+#print(stringAndSound)
+
+print(bassString("e", 5))

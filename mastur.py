@@ -9,48 +9,56 @@
 #   Punktacja za dobre odpowiedzi
 #   Im wyższe progi tym więcej punktów
 #   Im szybciej, tym więcej punktów
+#
+# 1. apka losuje dzwiek i pyta usera gdzie jest ten dzwiek
+# 2. user podaje nazwe struny i numer progu
+# 3. apka sprawdza czy nazwa struny i numer progu odpowiadają nazwie dźwięku
+#
+#
 
 import random
 
 sounds = ["a", "a#", "b", "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#"]
-bassStrings = ["e", "a", "d", "g"]
 
 print(sounds)
 
-def strE(fret):
-    if fret > 4:
-        fret -= 12
-    sound = sounds[fret + 7]
-    return sound
-
-#w budowie:
-#def bassString(name, fret):
-
-#zrobić jeszcze losowanie strun
-
-#
+def bassString(name, fret): # return a name of the sound assigned to a fret on the particular string
+    if fret > 24:
+        print("There are 24 frets!")
+    else:
+        if name == "e":
+            if fret > 4:
+                fret -= 12
+            sound = sounds[fret + 7]
+            return sound
+        elif name == "a":
+            sound = sounds[fret]
+            return sound        
+        elif name == "d":
+            if fret > 6:
+                fret -= 12
+            sound = sounds[fret + 5]
+            return sound
+        elif name == "g":
+            if fret > 1:
+                fret -= 12
+            sound = sounds[fret + 10]
+            return sound
+        else:
+            return 0
 
 
 def randomSound():
-    #return sounds[random.randint(0, 11)]
     return random.choice(sounds)
 
 question = randomSound()
-answer = int(input(f"On which fret of the E string you can find sound {question}? "))
+answerStr = input(f"Where is sound {question}? Type the name of the string: ")
+answerFret = int(input(f"Now type the fret number: "))
 
-def isRight(x):
-    if strE(x) == question:
+def isRight(x, y):
+    if bassString(x, y) == question:
         return "ok!"
     else:
         return "wrong"
 
-
-print(isRight(answer))
-
-
-#teraz warunek testujący czy odpowiedź jest dobra (funkcja?)
-
-
-#input_fret = int(input("Which fret on the E string?"))
-
-#print(f"{input_fret} fret on the E string is {strE(input_fret)}")
+print(isRight(answerStr, answerFret))
