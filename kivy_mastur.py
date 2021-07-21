@@ -15,7 +15,7 @@ class SayHello(App):
 
         # add widgets to window
 
-        # text widget
+        # text widgetgit 
         self.left = Label(
                         text = "text"
                         ) 
