@@ -1,4 +1,4 @@
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -6,23 +6,16 @@ from kivy.uix.button import Button
 #from kivy.uix.textinput import TextInput
 #from kivy.uix.image import Image
 
-from kivy.core.window import Window     # to get resolution
+from kivy.core.window import Window
 
-from kivymd.uix.button import MDFlatButton
-
-from kivy.config import Config
+from kivymd.uix.button import MDFlatButton, MDRectangleFlatButton, MDIconButton 
 
 
 
 
-class SayHello(App):
+class SayHello(MDApp):
     def build(self):
         # self.theme_cls.primary_palette = "Red"
-
-
-             
-        Window.size = (350,700)       #proporcje telefonu mniej więcej
-        window_size = Window.size  
 
         self.window = GridLayout()       
         self.window.cols = 2
@@ -30,10 +23,8 @@ class SayHello(App):
         # add widgets to window
 
         # text widgetgit 
-        
-
         self.left = Label(
-                        text = f"text\n{window_size}"                     
+                        text = "text "                     
                         ) 
         self.window.add_widget(self.left)
 
@@ -41,12 +32,12 @@ class SayHello(App):
         # fretboard widget
         self.fretboard = GridLayout() 
         self.fretboard.cols = 4
-        self.fretboard.size_hint = (0.6,1)
+        self.fretboard.width = 150
         self.window.add_widget(self.fretboard)
 
         f = 0.944
-        frets = 24
-        fret_color = (2.5,0.3,1,1)
+        frets = 22
+
 
         self.Estring = GridLayout()
         self.Estring.rows = frets
@@ -80,7 +71,7 @@ class SayHello(App):
             self.Estring.add_widget(Button(
                 # text = (f'Fret {num}, {f**i}{symbol}'), 
                 text = (f'{symbol1}'), 
-                background_color = (fret_color),
+                background_color = (0.5,1,1,1),
                # background_normal = '',
                 border = (5,5,5,5),
                 size_hint = (2, f**i)
@@ -89,7 +80,7 @@ class SayHello(App):
             self.Astring.add_widget(Button(
                 # text = (f'Fret {num}, {f**i}{symbol}'), 
                 text = (f''), 
-                background_color = (fret_color),
+                background_color = (0.5,1,1,1),
                # background_normal = '',
                 border = (5,5,5,5),
                 size_hint = (2, f**i)
@@ -98,7 +89,7 @@ class SayHello(App):
             self.Dstring.add_widget(Button(
                 # text = (f'Fret {num}, {f**i}{symbol}'), 
                 text = (f'{symbol2}'), 
-                background_color = (fret_color),
+                background_color = (0.5,1,1,1),
                # background_normal = '',
                 border = (5,5,5,5),
                 size_hint = (2, f**i)
@@ -107,13 +98,11 @@ class SayHello(App):
             self.Gstring.add_widget(Button(
                 # text = (f'Fret {num}, {f**i}{symbol}'), 
                 text = (f''), 
-                background_color = (fret_color),
+                background_color = (0.5,1,1,1),
                # background_normal = '',
                 border = (5,5,5,5),
                 size_hint = (2, f**i)
-                ))      
-        
- 
+                ))            
 
         # self.fretboard = Label(
         #                 text = "fretboard"
