@@ -5,6 +5,8 @@ from kivy.uix.button import Button
 # from kivy.uix.boxlayout import BoxLayout
 #from kivy.uix.textinput import TextInput
 from kivy.uix.image import Image
+# from kivy.uix.layout import Layout
+
 
 from functools import partial
 
@@ -16,31 +18,88 @@ from kivy.config import Config
 
 
 class Mastur(App):
-    def build(self):
-                     
+
+    def build(self):     
         Window.size = (350,700)       # mobile screen ratio moreless
         window_size = Window.size  
 
         self.window = GridLayout()       
         self.window.cols = 2
 
-        # add widgets to window     
-
         # leftpanel widget          ### ADD LOGO
-        self.leftpanel = GridLayout()
-        self.leftpanel.rows = 2       
-        self.window.add_widget(self.leftpanel)
-        
-        self.content = Label(
-                        text = f"text\n{window_size}"                     
-                        ) 
+        self.leftpanel = GridLayout(
+                                    rows=6,
+                                    size_hint = (1,1),
+                                    # padding = (10,0)
+                                    )
+        self.window.add_widget(self.leftpanel)     
+
         self.logo = Image(
                         source = "logo.png",
-                        size_hint = (0.9,0.12)
-                        )
-
+                        size_hint = (0.9,2)
+                        )                        
         self.leftpanel.add_widget(self.logo)
+
+        # content widget inside of leftpanel
+        self.content = GridLayout(
+                                rows=5,
+                                size_hint = (1,18),
+                                padding = (16,0)
+                                )   
         self.leftpanel.add_widget(self.content)
+
+        self.console = Label(
+                        text = f"text\n{window_size}\n{self.leftpanel.size}\n{window_size[1]}",  
+                        valign = "top",
+                        font_size = "10sp",
+                        # padding_y = (20, 20),
+                        # text_size = [150, None],  
+                        # halign = "left",
+                        size_hint = (1,2)                 
+                        )        
+        self.console.bind(size=self.console.setter('text_size'))    # how does it work? 
+        self.play = Label(
+                        text = f"play" ,
+                        valign = "bottom",
+                        size_hint = (1,1)                     
+                        ) 
+        self.play.bind(size=self.play.setter('text_size')) 
+        self.sound_name = Label(            
+                        text = f"C#",  
+                        valign = "middle",                      
+                        font_size =  "65sp",
+                        color = "#DC1A58",
+                        bold = True,
+                        # font_name :       # change font? Roboto -> Lato (font file)
+                        # font family:  # ?
+                        size_hint = (1,2) 
+                        )
+        self.sound_name.bind(size=self.sound_name.setter('text_size')) 
+        self.timer = Label(
+                        text = f"00:00",
+                        valign = "middle",
+                        halign = "center",
+                        size_hint = (1,10) 
+                        )
+        self.timer.bind(size=self.timer.setter('text_size')) 
+        self.score = Label(
+                        text = f"score: 0",
+                        valign="top",
+                        size_hint = (1,3) 
+                        )
+        self.score.bind(size=self.score.setter('text_size')) 
+        
+
+
+
+        self.content.add_widget(self.console)
+        self.content.add_widget(self.play)
+        self.content.add_widget(self.sound_name)
+        self.content.add_widget(self.timer)
+        self.content.add_widget(self.score)
+
+
+
 
         # fretboard widget
         self.fretboard = GridLayout() 
@@ -91,8 +150,11 @@ class Mastur(App):
          
         return self.window
     
+    def update(self, *args):
+        pass
+    
     def callback(self, *args):
-        self.content.text = f"string {args[1]} \nfret number {args[0]}"   
+        self.console.text = f"string {args[1]} \nfret number {args[0]}"   
 
     def Frets(self, *args):
         string = args[0]

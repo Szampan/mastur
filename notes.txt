@@ -1,4 +1,28 @@
 
+#
+# 2. quiz do zgadywania w którym miejscu jest dźwięk 
+#    Np. pytanie: Gdzie jest E? Odp.: E0, A7, E12, D3
+#
+# 3. Ficzery:
+#   Punktacja za dobre odpowiedzi
+#   Im wyższe progi tym więcej punktów
+#   Im szybciej, tym więcej punktów
+#
+# 1. apka losuje dzwiek i pyta usera gdzie jest ten dzwiek
+# 2. user podaje nazwe struny i numer progu
+# 3. apka sprawdza czy nazwa struny i numer progu odpowiadają nazwie dźwięku
+#
+#
+
+####################
+##### ZROBIONE #####
+####################
+
+# 1. Gryf: 
+#    odległości między progami jako ułamek całości
+#    Najlepiej jako funkcja rekurencyjna
+
+
 FRET CALCULATOR:
 https://www.stewmac.com/fret-calculator/
 
