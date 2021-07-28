@@ -4,7 +4,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 # from kivy.uix.boxlayout import BoxLayout
 #from kivy.uix.textinput import TextInput
-#from kivy.uix.image import Image
+from kivy.uix.image import Image
 
 from functools import partial
 
@@ -26,11 +26,21 @@ class Mastur(App):
 
         # add widgets to window     
 
-        # leftpanel widget
-        self.leftpanel = Label(
+        # leftpanel widget          ### ADD LOGO
+        self.leftpanel = GridLayout()
+        self.leftpanel.rows = 2       
+        self.window.add_widget(self.leftpanel)
+        
+        self.content = Label(
                         text = f"text\n{window_size}"                     
                         ) 
-        self.window.add_widget(self.leftpanel)
+        self.logo = Image(
+                        source = "logo.png",
+                        size_hint = (0.9,0.12)
+                        )
+
+        self.leftpanel.add_widget(self.logo)
+        self.leftpanel.add_widget(self.content)
 
         # fretboard widget
         self.fretboard = GridLayout() 
@@ -42,16 +52,16 @@ class Mastur(App):
         frets = 24   
 
         self.E_string = GridLayout()
-        self.E_string.rows = frets
+        self.E_string.rows = frets+1    
 
         self.A_string = GridLayout()
-        self.A_string.rows = frets
+        self.A_string.rows = frets+1
         
         self.D_string = GridLayout()
-        self.D_string.rows = frets
+        self.D_string.rows = frets+1
         
         self.G_string = GridLayout()
-        self.G_string.rows = frets
+        self.G_string.rows = frets+1
         
         self.fretboard.add_widget(self.E_string)
         self.fretboard.add_widget(self.A_string)
@@ -59,8 +69,9 @@ class Mastur(App):
         self.fretboard.add_widget(self.G_string)        
 
         # fret buttons inside of EADG strings widgets
-        for i in range(frets):
-            num = i + 1 
+        for i in range(frets+1):
+            # num = i + 1 
+            num = i
 
             self.E_frets = self.Frets("E", i, num)
             self.E_frets.bind(on_press = partial(self.callback, num, "E"))
@@ -81,13 +92,13 @@ class Mastur(App):
         return self.window
     
     def callback(self, *args):
-        self.leftpanel.text = f"string {args[1]} \nfret number {args[0]}"   
+        self.content.text = f"string {args[1]} \nfret number {args[0]}"   
 
     def Frets(self, *args):
         string = args[0]
         i = args[1]       
         num = args[2]
-        fret_color = (2.5,0.3,1,1)  #                                   NA ZEWNĄTRZ?    
+        fret_color = (2.5,0.3,1,1) if num !=0 else (0.3,0.3,0.3,1)  #                                   NA ZEWNĄTRZ?    
         f = 0.944                   # length of each subsequent fret    NA ZEWNĄTRZ?        
         
         symbol, symbol1, symbol2 = " " *3
@@ -105,7 +116,7 @@ class Mastur(App):
             text = (f'{symbol}'),
             background_color = (fret_color),               
             border = (5,5,5,5),
-            size_hint = (2, f**i)
+            size_hint = (2, f**i) if num !=0 else (1,0.5)
             )
         return btn
 
