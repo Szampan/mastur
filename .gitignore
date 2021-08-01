@@ -4,5 +4,5 @@ private.txt
 /kivy_venv
 /venv
 /temp
-
+/__pycache__
 

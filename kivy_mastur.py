@@ -1,27 +1,37 @@
+
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-# from kivy.uix.boxlayout import BoxLayout
-#from kivy.uix.textinput import TextInput
 from kivy.uix.image import Image
-# from kivy.uix.layout import Layout
-
-
-from functools import partial
 
 from kivy.core.window import Window     # to get resolution
 
-from kivymd.uix.button import MDFlatButton
+from functools import partial
+from random import choice
 
-from kivy.config import Config
+# class Mechanics():
+#     sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+#     question = self.random_sound
+
+
+#     def random_sound(self):
+#         return choice(self.sounds)
 
 
 class Mastur(App):
 
+    sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+    # question = "B" # przypiąć do randoma jakoś
+    score_wgt = 0
+    score = 0
+
+
+
     def build(self):     
         Window.size = (350,700)       # mobile screen ratio moreless
         window_size = Window.size  
+        # question = self.random_sound()
 
         self.window = GridLayout()       
         self.window.cols = 2
@@ -48,8 +58,9 @@ class Mastur(App):
                                 )   
         self.leftpanel.add_widget(self.content)
 
-        self.console = Label(
-                        text = f"text\n{window_size}\n{self.leftpanel.size}\n{window_size[1]}",  
+        self.console_wgt = Label(
+                        # text = f"Window size: {window_size}\nString E, fret 8: {self.note_name('E', 8)}",  
+                        text = f"{question}",  
                         valign = "top",
                         font_size = "10sp",
                         # padding_y = (20, 20),
@@ -57,15 +68,15 @@ class Mastur(App):
                         # halign = "left",
                         size_hint = (1,2)                 
                         )        
-        self.console.bind(size=self.console.setter('text_size'))    # how does it work? 
-        self.play = Label(
+        self.console_wgt.bind(size=self.console_wgt.setter('text_size'))    # how does it work? 
+        self.play_txt_wgt = Label(
                         text = f"play" ,
                         valign = "bottom",
                         size_hint = (1,1)                     
                         ) 
-        self.play.bind(size=self.play.setter('text_size')) 
-        self.sound_name = Label(            
-                        text = f"C#",  
+        self.play_txt_wgt.bind(size=self.play_txt_wgt.setter('text_size')) 
+        self.sound_question_wgt = Label(            
+                        text = f"{question}",  
                         valign = "middle",                      
                         font_size =  "65sp",
                         color = "#DC1A58",
@@ -74,32 +85,26 @@ class Mastur(App):
                         # font family:  # ?
                         size_hint = (1,2) 
                         )
-        self.sound_name.bind(size=self.sound_name.setter('text_size')) 
-        self.timer = Label(
+        self.sound_question_wgt.bind(size=self.sound_question_wgt.setter('text_size')) 
+        self.timer_wgt = Label(
                         text = f"00:00",
                         valign = "middle",
                         halign = "center",
                         size_hint = (1,10) 
                         )
-        self.timer.bind(size=self.timer.setter('text_size')) 
-        self.score = Label(
-                        text = f"score: 0",
+        self.timer_wgt.bind(size=self.timer_wgt.setter('text_size')) 
+        self.score_wgt = Label(
+                        text = f"score: ",
                         valign="top",
                         size_hint = (1,3) 
                         )
-        self.score.bind(size=self.score.setter('text_size')) 
-        
+        self.score_wgt.bind(size=self.score_wgt.setter('text_size'))      
 
-
-
-        self.content.add_widget(self.console)
-        self.content.add_widget(self.play)
-        self.content.add_widget(self.sound_name)
-        self.content.add_widget(self.timer)
-        self.content.add_widget(self.score)
-
-
-
+        self.content.add_widget(self.console_wgt)
+        self.content.add_widget(self.play_txt_wgt)
+        self.content.add_widget(self.sound_question_wgt)
+        self.content.add_widget(self.timer_wgt)
+        self.content.add_widget(self.score_wgt)
 
         # fretboard widget
         self.fretboard = GridLayout() 
@@ -131,32 +136,48 @@ class Mastur(App):
         for i in range(frets+1):
             # num = i + 1 
             num = i
-
-            self.E_frets = self.Frets("E", i, num)
+            self.E_frets = self.frets("E", i, num)
             self.E_frets.bind(on_press = partial(self.callback, num, "E"))
             self.E_string.add_widget(self.E_frets)
 
-            self.A_frets = self.Frets("A", i, num)
+            self.A_frets = self.frets("A", i, num)
             self.A_frets.bind(on_press = partial(self.callback, num, "A"))
             self.A_string.add_widget(self.A_frets)
 
-            self.D_frets = self.Frets("D", i, num)
+            self.D_frets = self.frets("D", i, num)
             self.D_frets.bind(on_press = partial(self.callback, num, "D"))
             self.D_string.add_widget(self.D_frets)
 
-            self.G_frets = self.Frets("G", i, num)
+            self.G_frets = self.frets("G", i, num)
             self.G_frets.bind(on_press = partial(self.callback, num, "G"))
             self.G_string.add_widget(self.G_frets)      
          
         return self.window
     
-    def update(self, *args):
-        pass
+    # def update(self, *args):
+    #     pass
     
-    def callback(self, *args):
-        self.console.text = f"string {args[1]} \nfret number {args[0]}"   
+    def callback(self, *args):     
+        string = args[1]
+        fret_number = args[0]           
+        line_1 = f"string: {string} \nfret number: {fret_number}"
+        line_2 = f"sound name: {self.note_name(string, fret_number)}"
 
-    def Frets(self, *args):
+        if self.is_right(string, fret_number):
+            line_3 = f"GOOD"
+            self.score += 1
+        else:
+            line_3 = f"Not good..."
+            self.score = 0
+            
+        line_4 = self.score
+
+        self.console_wgt.text = f"{line_2}\n{line_3}\n{line_4}"   
+        self.score_wgt.text = f"score: {self.score}"
+        # self.console.text = f"string {args[1]} \nfret number {args[0]}\nString E, fret 8: {self.note_name('e', 8)}"   
+
+
+    def frets(self, *args):
         string = args[0]
         i = args[1]       
         num = args[2]
@@ -181,6 +202,54 @@ class Mastur(App):
             size_hint = (2, f**i) if num !=0 else (1,0.5)
             )
         return btn
+
+    def note_name(self, *args): # return a name of the sound assigned to a fret on the particular string
+        string_name = str(args[0])
+        fret = args[1]
+        sounds = self.sounds
+        if fret > 24:
+            print("There are 24 frets!")        
+        else:
+            if string_name == "E":
+                while fret > 4:
+                    fret -= 12
+                sound = sounds[fret + 7]
+                return sound
+            elif string_name == "A":
+                while fret > 11:
+                    fret -= 12
+                sound = sounds[fret]
+                return sound        
+            elif string_name == "D":
+                while fret > 6:
+                    fret -= 12
+                sound = sounds[fret + 5]
+                return sound
+            elif string_name == "G":
+                while fret > 1:
+                    fret -= 12
+                sound = sounds[fret + 10]
+                return sound
+            else:
+                print(f"Error\nname: {string_name}\nfret: {fret}")
+                return "-"
+
+    def random_sound(self):
+        return choice(self.sounds)
+    
+
+    def is_right(self, *args):        
+        string_name = args[0]
+        fret = args[1]
+        # question = args[2]
+        if self.note_name(string_name, fret) == question:        # do czego przypisać question?
+            print("ok!")
+            return True
+        else:
+            print("wrong")
+            return False
+
+question = Mastur().random_sound()
 
 
     # def callback(self, event):
