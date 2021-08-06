@@ -7,26 +7,20 @@ from kivy.uix.image import Image
 
 from kivy.core.window import Window     # to get resolution
 
+# from kivy.lang import Builder
+from mastur_timer import IncrediblyCrudeClock
+
 from functools import partial
 from random import choice
-
-# class Mechanics():
-#     sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-#     question = self.random_sound
-
-
-#     def random_sound(self):
-#         return choice(self.sounds)
 
 
 class Mastur(App):
 
     sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     # question = "B" # przypiąć do randoma jakoś
-    score_wgt = 0
+    # score_wgt = 0
     score = 0
-
-
+    q_test = None      # zamiast zewnętrznego question. jakaś funkcja ma updejtować q_test
 
     def build(self):     
         Window.size = (350,700)       # mobile screen ratio moreless
@@ -38,7 +32,7 @@ class Mastur(App):
 
         # leftpanel widget          ### ADD LOGO
         self.leftpanel = GridLayout(
-                                    rows=6,
+                                    rows=2,
                                     size_hint = (1,1),
                                     # padding = (10,0)
                                     )
@@ -52,7 +46,7 @@ class Mastur(App):
 
         # content widget inside of leftpanel
         self.content = GridLayout(
-                                rows=5,
+                                rows=6, # docelowo ma być 5 (6 jest na potrzeby testów)
                                 size_hint = (1,18),
                                 padding = (16,0)
                                 )   
@@ -60,7 +54,7 @@ class Mastur(App):
 
         self.console_wgt = Label(
                         # text = f"Window size: {window_size}\nString E, fret 8: {self.note_name('E', 8)}",  
-                        text = f"{question}",  
+                        text = f"{self.q_test}",  
                         valign = "top",
                         font_size = "10sp",
                         # padding_y = (20, 20),
@@ -76,7 +70,7 @@ class Mastur(App):
                         ) 
         self.play_txt_wgt.bind(size=self.play_txt_wgt.setter('text_size')) 
         self.sound_question_wgt = Label(            
-                        text = f"{question}",  
+                        text = f"{self.q_test}",  
                         valign = "middle",                      
                         font_size =  "65sp",
                         color = "#DC1A58",
@@ -86,13 +80,25 @@ class Mastur(App):
                         size_hint = (1,2) 
                         )
         self.sound_question_wgt.bind(size=self.sound_question_wgt.setter('text_size')) 
-        self.timer_wgt = Label(
-                        text = f"00:00",
-                        valign = "middle",
-                        halign = "center",
-                        size_hint = (1,10) 
+
+        # self.timer_wgt = Label(
+        #                 text = f"00:00",
+        #                 valign = "middle",
+        #                 halign = "center",
+        #                 size_hint = (1,10) 
+        #                 )
+        # self.timer_wgt.bind(size=self.timer_wgt.setter('text_size')) 
+
+        self.start_wgt = Button(
+                        text = "►"
                         )
-        self.timer_wgt.bind(size=self.timer_wgt.setter('text_size')) 
+        self.start_wgt.bind(on_press = partial(self.start_callback, 2137))    
+
+        self.crudeclock = IncrediblyCrudeClock(laps=3)  
+  
+        # self.crudeclock.start()
+
+
         self.score_wgt = Label(
                         text = f"score: ",
                         valign="top",
@@ -103,7 +109,10 @@ class Mastur(App):
         self.content.add_widget(self.console_wgt)
         self.content.add_widget(self.play_txt_wgt)
         self.content.add_widget(self.sound_question_wgt)
-        self.content.add_widget(self.timer_wgt)
+        # self.content.add_widget(self.timer_wgt)
+        self.content.add_widget(self.start_wgt)      # testowo
+
+        self.content.add_widget(self.crudeclock)
         self.content.add_widget(self.score_wgt)
 
         # fretboard widget
@@ -176,6 +185,15 @@ class Mastur(App):
         self.score_wgt.text = f"score: {self.score}"
         # self.console.text = f"string {args[1]} \nfret number {args[0]}\nString E, fret 8: {self.note_name('e', 8)}"   
 
+    def start_callback(self, *args):
+        ### < dodać randomowy wybór dźwięku
+      
+        self.q_test = self.random_sound()
+        print(f"Sound to guess: {self.q_test}")
+        self.sound_question_wgt.text = f"{self.q_test}"
+        self.console_wgt.text = f"Start!"   # do poprawienia: starting anim number się nie zeruje, więc odlicza tylko raz
+        self.crudeclock.start()
+
 
     def frets(self, *args):
         string = args[0]
@@ -241,15 +259,16 @@ class Mastur(App):
     def is_right(self, *args):        
         string_name = args[0]
         fret = args[1]
-        # question = args[2]
-        if self.note_name(string_name, fret) == question:        # do czego przypisać question?
+        # self.q_test = args[2]
+        if self.note_name(string_name, fret) == self.q_test:        # do czego przypisać question?
             print("ok!")
             return True
         else:
             print("wrong")
             return False
 
-question = Mastur().random_sound()
+
+# question = Mastur().random_sound()
 
 
     # def callback(self, event):

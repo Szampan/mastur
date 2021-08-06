@@ -1,4 +1,9 @@
+sekwencja działania:
+1. po otwarciu apki wielki przycisk PLAY (trójkącik) w miejscu dźwięku do odgadnięcia
+2. po wciśnięciu PLAY znika, a zamiast niego pojawia się dźwięk do odgadnięcia
+3. po game overze zamiast dźwięku znowu pojawia się PLAY
 
+_________
 #
 # 2. quiz do zgadywania w którym miejscu jest dźwięk 
 #    Np. pytanie: Gdzie jest E? Odp.: E0, A7, E12, D3
@@ -21,6 +26,14 @@
 # 1. Gryf: 
 #    odległości między progami jako ułamek całości
 #    Najlepiej jako funkcja rekurencyjna
+
+#
+schemat:
+1. przypisać wylosowany dźwięk do zmiennej question
+2. wyświetlić zmienną question jako różową nazwę dźwięku
+3. sprawdzić, czy naciśnięty próg jest zgodny ze zmienną question. 
+	Jeśli tak, to score +1
+#
 
 
 FRET CALCULATOR:
