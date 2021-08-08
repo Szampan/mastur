@@ -4,6 +4,10 @@ sekwencja działania:
 3. po game overze zamiast dźwięku znowu pojawia się PLAY
 
 _________
+- w jednej turze tylko raz można dostać punkt za zagranie dźwięku na jednej pozycji
+- za zagranie dźwięku w jednej turze na innej pozycji dodatkowe punkty
+
+_________
 #
 # 2. quiz do zgadywania w którym miejscu jest dźwięk 
 #    Np. pytanie: Gdzie jest E? Odp.: E0, A7, E12, D3

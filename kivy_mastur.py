@@ -9,6 +9,7 @@ from kivy.core.window import Window     # to get resolution
 
 # from kivy.lang import Builder
 from mastur_timer import IncrediblyCrudeClock
+# 
 
 from functools import partial
 from random import choice
@@ -17,20 +18,17 @@ from random import choice
 class Mastur(App):
 
     sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-    # question = "B" # przypiąć do randoma jakoś
-    # score_wgt = 0
     score = 0
-    q_test = None      # zamiast zewnętrznego question. jakaś funkcja ma updejtować q_test
+    question = None     
 
     def build(self):     
         Window.size = (350,700)       # mobile screen ratio moreless
-        window_size = Window.size  
-        # question = self.random_sound()
+        window_size = Window.size          
 
         self.window = GridLayout()       
         self.window.cols = 2
 
-        # leftpanel widget          ### ADD LOGO
+        # leftpanel widget         
         self.leftpanel = GridLayout(
                                     rows=2,
                                     size_hint = (1,1),
@@ -54,7 +52,7 @@ class Mastur(App):
 
         self.console_wgt = Label(
                         # text = f"Window size: {window_size}\nString E, fret 8: {self.note_name('E', 8)}",  
-                        text = f"{self.q_test}",  
+                        text = f"{self.question}",  
                         valign = "top",
                         font_size = "10sp",
                         # padding_y = (20, 20),
@@ -63,24 +61,43 @@ class Mastur(App):
                         size_hint = (1,2)                 
                         )        
         self.console_wgt.bind(size=self.console_wgt.setter('text_size'))    # how does it work? 
-        self.play_txt_wgt = Label(
-                        text = f"play" ,
+        self.play_txt_wgt = Label(              # CHYBA NIEPOTRZEBNY
+                        text = f"",             # było "play"
                         valign = "bottom",
                         size_hint = (1,1)                     
                         ) 
         self.play_txt_wgt.bind(size=self.play_txt_wgt.setter('text_size')) 
-        self.sound_question_wgt = Label(            
-                        text = f"{self.q_test}",  
+
+        self.start_and_sound_wgt = GridLayout(
+                                cols = 1,
+                                size_hint = (1,2)                               # 
+                                
+                                )
+
+        self.sound_question_wgt = Label(           # SHOW AFTER START, HIDE WHEN GAME OVER
+                        text = f"{self.question}",  
                         valign = "middle",                      
                         font_size =  "65sp",
                         color = "#DC1A58",
-                        bold = True,
-                        # font_name :       # change font? Roboto -> Lato (font file)
-                        # font family:  # ?
-                        size_hint = (1,2) 
+                        bold = True,                     
+                        size_hint = (0,0),  
+                        opacity = 0
                         )
         self.sound_question_wgt.bind(size=self.sound_question_wgt.setter('text_size')) 
 
+
+        self.start_wgt = Button(                    # HIDE AFTER START, SHOW WHEN GAME OVER
+                        text = "START",
+                        background_color = (2.5,0.3,1,1),
+                        # opacity = 0.5,
+                        # disabled = True,
+                        
+                        )
+        self.start_wgt.bind(on_press = partial(self.start_callback))    
+
+        self.crudeclock = IncrediblyCrudeClock(laps=3)  
+        self.crudeclock.size_hint = (1,10)        
+        self.crudeclock.bind(size=self.crudeclock.setter('text_size')) 
         # self.timer_wgt = Label(
         #                 text = f"00:00",
         #                 valign = "middle",
@@ -89,12 +106,7 @@ class Mastur(App):
         #                 )
         # self.timer_wgt.bind(size=self.timer_wgt.setter('text_size')) 
 
-        self.start_wgt = Button(
-                        text = "►"
-                        )
-        self.start_wgt.bind(on_press = partial(self.start_callback, 2137))    
 
-        self.crudeclock = IncrediblyCrudeClock(laps=3)  
   
         # self.crudeclock.start()
 
@@ -107,25 +119,30 @@ class Mastur(App):
         self.score_wgt.bind(size=self.score_wgt.setter('text_size'))      
 
         self.content.add_widget(self.console_wgt)
-        self.content.add_widget(self.play_txt_wgt)
-        self.content.add_widget(self.sound_question_wgt)
+        self.content.add_widget(self.play_txt_wgt)      # CHYBA NIEPOTRZEBNE
+
+        self.content.add_widget(self.start_and_sound_wgt)
+
+        self.start_and_sound_wgt.add_widget(self.sound_question_wgt)
         # self.content.add_widget(self.timer_wgt)
-        self.content.add_widget(self.start_wgt)      # testowo
+        self.start_and_sound_wgt.add_widget(self.start_wgt)      # testowo
 
         self.content.add_widget(self.crudeclock)
         self.content.add_widget(self.score_wgt)
 
         # fretboard widget
-        self.fretboard = GridLayout() 
-        self.fretboard.cols = 4
-        self.fretboard.size_hint = (0.6,1)
+        self.fretboard = GridLayout(
+                        cols = 4,
+                        size_hint = (0.6,1),
+                        disabled = True
+                        )        
         self.window.add_widget(self.fretboard)
 
         # EADG strings widgets inside of the fretboard widget        
         frets = 24   
 
         self.E_string = GridLayout()
-        self.E_string.rows = frets+1    
+        self.E_string.rows = frets+1       
 
         self.A_string = GridLayout()
         self.A_string.rows = frets+1
@@ -185,21 +202,55 @@ class Mastur(App):
         self.score_wgt.text = f"score: {self.score}"
         # self.console.text = f"string {args[1]} \nfret number {args[0]}\nString E, fret 8: {self.note_name('e', 8)}"   
 
-    def start_callback(self, *args):
-        ### < dodać randomowy wybór dźwięku
+    def start_callback(self, *args):        
       
-        self.q_test = self.random_sound()
-        print(f"Sound to guess: {self.q_test}")
-        self.sound_question_wgt.text = f"{self.q_test}"
-        self.console_wgt.text = f"Start!"   # do poprawienia: starting anim number się nie zeruje, więc odlicza tylko raz
-        self.crudeclock.start()
+        # self.question = self.random_sound()
+        # print(f"Sound to guess: {self.question}")
+        # self.sound_question_wgt.text = f"{self.question}"
 
+        # self.new_round()
+        self.console_wgt.text = f"Start!"   
+        self.score = 0
+        self.crudeclock.start(self.game_over, self.new_round)         # function passed to a child as an argument
+        
+        self.start_wgt.size_hint = (0, 0)
+        self.start_wgt.opacity = 0
+        self.start_wgt.disabled = True
+        self.sound_question_wgt.size_hint = (1,1)
+        self.sound_question_wgt.opacity = 1
+
+        
+        
+
+        #self.sound_question_wgt         # <- to ma się pojawić po naciśnięciu start
+        # self.start_wgt.height = 0
+
+    def new_round(self):
+        self.question = self.random_sound()
+        print(f"Sound to guess: {self.question}")
+        self.sound_question_wgt.text = f"{self.question}"
+        self.crudeclock.opacity = 1
+        self.fretboard.disabled = False
+
+    def game_over(self, *args):
+        # something = args[0]     # not sure if needed
+        self.console_wgt.text = f"Game over\nYour score: {self.score}"  
+        print(f"Game over\nYour score: {self.score}")
+
+        self.sound_question_wgt.size_hint = (0,0)
+        self.sound_question_wgt.opacity = 0     
+
+        self.start_wgt.size_hint = (1, 1)
+        self.start_wgt.opacity = 1
+        self.start_wgt.disabled = False
+        self.fretboard.disabled = True      
 
     def frets(self, *args):
         string = args[0]
         i = args[1]       
         num = args[2]
         fret_color = (2.5,0.3,1,1) if num !=0 else (0.3,0.3,0.3,1)  #                                   NA ZEWNĄTRZ?    
+        
         f = 0.944                   # length of each subsequent fret    NA ZEWNĄTRZ?        
         
         symbol, symbol1, symbol2 = " " *3
@@ -215,7 +266,7 @@ class Mastur(App):
 
         btn = Button(                 
             text = (f'{symbol}'),
-            background_color = (fret_color),               
+            background_color = (fret_color),            
             border = (5,5,5,5),
             size_hint = (2, f**i) if num !=0 else (1,0.5)
             )
@@ -260,7 +311,7 @@ class Mastur(App):
         string_name = args[0]
         fret = args[1]
         # self.q_test = args[2]
-        if self.note_name(string_name, fret) == self.q_test:        # do czego przypisać question?
+        if self.note_name(string_name, fret) == self.question:        # do czego przypisać question?
             print("ok!")
             return True
         else:
