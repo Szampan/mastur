@@ -16,7 +16,19 @@ class IncrediblyCrudeClock(Label):
         self.lap_counter = 0
         super(IncrediblyCrudeClock, self).__init__(**kwargs)    # most classes must have their own __init__() executed in order to work correctly. The super calls the __init__() of the Label
 
+    def stop(self):
+        print("KONIEC")
+        
+        return      #  timer się nie wyłącza !!!!! 
+                    # ta funkcja mogłaby wysyłać sygnał
+
+    '''
+    def signal cośtam
+    a ta funkcja mogłaby odpalać funkcję start i czekać na sygnał do wyłączenia
+    '''
+
     def start(self, *args):    
+        # print(TEST)
         
         if self.lap_counter == 0 and args:
             print("zewnętrzny argument: ", args[0])
@@ -52,7 +64,7 @@ Builder.load_string('''
     font_size: '150sp'
     color: '#1A1A1A'
     valign: 'middle' 
-    opacity: '0'
+    # opacity: '0'
 ''')
 
 

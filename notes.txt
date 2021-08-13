@@ -1,3 +1,27 @@
+Threading timer() 
+za pomocą timer.cancel() można go zatrzymać i anulować wykonywanie akcji (tylko podczas czekania)
+^ można z tego spróbować zrobić timer, który można ubić.
+
+
+from threading import Timer
+
+def hello():
+    print("hello, world")
+
+t = Timer(30.0, hello)
+t.start()  # after 30 seconds, "hello, world" will be printed
+
+def pause():
+        t.cancel()
+        # pauseTime = time.time()	- coś innego, potrzebne do wznowienia timera
+
+
+
+_________
+
+Przeliczyć wysokość elementów lewego panelu
+_________
+
 sekwencja działania:
 1. po otwarciu apki wielki przycisk PLAY (trójkącik) w miejscu dźwięku do odgadnięcia
 2. po wciśnięciu PLAY znika, a zamiast niego pojawia się dźwięk do odgadnięcia

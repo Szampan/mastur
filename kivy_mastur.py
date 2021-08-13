@@ -1,4 +1,3 @@
-
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
@@ -8,11 +7,12 @@ from kivy.uix.image import Image
 from kivy.core.window import Window     # to get resolution
 
 # from kivy.lang import Builder
-from mastur_timer import IncrediblyCrudeClock
-# 
 
 from functools import partial
 from random import choice
+
+from mastur_timer import IncrediblyCrudeClock
+
 
 
 class Mastur(App):
@@ -194,7 +194,8 @@ class Mastur(App):
             self.score += 1
         else:
             line_3 = f"Not good..."
-            self.score = 0
+            # self.score = 0    # old version 
+            self.game_over()    # NAPRAWIĆ: game over nie przerywa timera
             
         line_4 = self.score
 
@@ -218,32 +219,34 @@ class Mastur(App):
         self.start_wgt.disabled = True
         self.sound_question_wgt.size_hint = (1,1)
         self.sound_question_wgt.opacity = 1
+               
 
-        
-        
+    def new_round(self):        
+        # wprowadzić do klasy atrybut przechowujący stan gry (runda trwa, albo nie). 
+        # jeśli runda nie trwa, to timer się wyłącza? (jak?)
+        # a fretboard pozostaje disabled
+        # ROZWIĄZANIE 1: przepisać klasę timera do głównego pliku i wykorzystać loop=True sprawdzany co odświeżenie timera
 
-        #self.sound_question_wgt         # <- to ma się pojawić po naciśnięciu start
-        # self.start_wgt.height = 0
-
-    def new_round(self):
         self.question = self.random_sound()
         print(f"Sound to guess: {self.question}")
         self.sound_question_wgt.text = f"{self.question}"
         self.crudeclock.opacity = 1
         self.fretboard.disabled = False
 
-    def game_over(self, *args):
-        # something = args[0]     # not sure if needed
+    def game_over(self):
+        
         self.console_wgt.text = f"Game over\nYour score: {self.score}"  
         print(f"Game over\nYour score: {self.score}")
 
         self.sound_question_wgt.size_hint = (0,0)
         self.sound_question_wgt.opacity = 0     
 
-        self.start_wgt.size_hint = (1, 1)
+        self.start_wgt.size_hint = (1, 1)          # zrobić funkcję hide_wgt(wgt, state=False)
         self.start_wgt.opacity = 1
         self.start_wgt.disabled = False
         self.fretboard.disabled = True      
+
+        IncrediblyCrudeClock().stop() #   próba wyłączenia timera..
 
     def frets(self, *args):
         string = args[0]
