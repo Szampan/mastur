@@ -1,17 +1,15 @@
+# Mastur v0.2
+
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.image import Image
-
 from kivy.core.window import Window     # to get resolution
-
-# from kivy.lang import Builder
 
 from functools import partial
 from random import choice
 
-# from mastur_timer import IncrediblyCrudeClock
 from simple_schedule_timer import SimpleTimer
 
 
@@ -21,6 +19,7 @@ class Mastur(App):
     sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     score = 0
     round_score = 0
+    round_answers = []
     question = None     
 
     def build(self):     
@@ -171,13 +170,19 @@ class Mastur(App):
         
     def frets_callback(self, *args):     
         string = args[1]
-        fret_number = args[0]           
+        fret_number = args[0]       
+        guess = (args[1], args[0])  
+        
         console_line_1 = f"string: {string} \nfret number: {fret_number}"
         console_line_2 = f"sound name: {self.note_name(string, fret_number)}"
 
-        if self.is_right(string, fret_number):
-            console_line_3 = f"GOOD"
-            self.round_score += 1     # dopisać logikę lepiej liczącą punkty. Wykorzystać round_score
+        if self.is_right(string, fret_number):            
+            if guess in self.round_answers:                
+                console_line_3 = "Try somewhere else!"
+            else:      
+                console_line_3 = f"GOOD"          
+                self.round_score += 2 ** len(self.round_answers)     # The score grows exponentially
+                self.round_answers.append(guess)
         else:
             console_line_3 = f"Not good..."            
             self.game_over()    
@@ -191,8 +196,8 @@ class Mastur(App):
 
     def start_callback(self, *args):        
       
-        self.console_wgt.text = f"Start!"   
-        self.score = 0     
+        self.console_wgt.text = f"Mastur: Start!"   
+        self.score = 0     # RESET
 
         # self.counter.start(self.round_over, self.new_round)  # zamiast game over round_over
         self.new_round()
@@ -205,11 +210,12 @@ class Mastur(App):
 
     def new_round(self):          
         print("Mastur: New round")      
+        
         self.counter.opacity = 1
         self.fretboard.disabled = False
         # self.round_score = 0
         self.question = self.random_sound()
-        print(f"Sound to guess: {self.question}")
+        print(f"Mastur: Sound to guess: {self.question}")
         self.sound_question_wgt.text = f"{self.question}"
         self.counter.start(self.round_over, self.new_round) 
         
@@ -218,14 +224,19 @@ class Mastur(App):
         # self.fretboard.disabled = False,
 
     def round_over(self):
+        print("Mastur: The round is over")
 
         ### BŁAD: jeśli jakiś dźwięk był odgadnięty, to game over jest o turę za późno
+        ### add round counter, or progressively speed up rounds
 
         if self.round_score == 0:
+            print("Mastur: Game over (time's up)")
             self.game_over()
         else:
+            print(f"Mastur: Gained {self.round_score} in this round")
             self.score += self.round_score
-            self.round_score = 0
+            self.round_score = 0        # RESET     
+            self.round_answers.clear()  # RESET       
             self.new_round()
 
     def game_over(self):
@@ -241,9 +252,8 @@ class Mastur(App):
         self.counter.opacity = 0
         self.start_wgt.disabled = False
         self.fretboard.disabled = True      
-
-        # IncrediblyCrudeClock().stop() #   próba wyłączenia timera..
-        # self.counter.stop()
+      
+        self.round_answers.clear()          # RESET
         self.counter.event.cancel()         # O ten działa super
 
     def frets(self, *args):
@@ -306,7 +316,7 @@ class Mastur(App):
 
     def random_sound(self):
         return choice(self.sounds)
-    
+   
 
     def is_right(self, *args):        
         string_name = args[0]
