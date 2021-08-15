@@ -12,7 +12,7 @@ from functools import partial
 from random import choice
 
 # from mastur_timer import IncrediblyCrudeClock
-from schedule_timer import DaTimer
+from simple_schedule_timer import SimpleTimer
 
 
 
@@ -20,6 +20,7 @@ class Mastur(App):
 
     sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     score = 0
+    round_score = 0
     question = None     
 
     def build(self):     
@@ -89,30 +90,13 @@ class Mastur(App):
 
         self.start_wgt = Button(                    # HIDE AFTER START, SHOW WHEN GAME OVER
                         text = "START",
-                        background_color = (2.5,0.3,1,1),
-                        # opacity = 0.5,
-                        # disabled = True,
-                        
+                        background_color = (2.5,0.3,1,1)                        
                         )
         self.start_wgt.bind(on_press = partial(self.start_callback))    
 
-        # self.crudeclock = IncrediblyCrudeClock(laps=3)  
-        # self.crudeclock.size_hint = (1,10)        
-        # self.crudeclock.bind(size=self.crudeclock.setter('text_size')) 
-        # # self.timer_wgt = Label(
-        # #                 text = f"00:00",
-        # #                 valign = "middle",
-        # #                 halign = "center",
-        # #                 size_hint = (1,10) 
-        # #                 )
-        # # self.timer_wgt.bind(size=self.timer_wgt.setter('text_size')) 
-
-        self.counter = DaTimer()
+        self.counter = SimpleTimer()
         self.counter.size_hint = (1,10)
         self.counter.bind(size=self.counter.setter('text_size'))
-  
-        
-
 
         self.score_wgt = Label(
                         text = f"score: ",
@@ -168,78 +152,81 @@ class Mastur(App):
             # num = i + 1 
             num = i
             self.E_frets = self.frets("E", i, num)
-            self.E_frets.bind(on_press = partial(self.callback, num, "E"))
+            self.E_frets.bind(on_press = partial(self.frets_callback, num, "E"))
             self.E_string.add_widget(self.E_frets)
 
             self.A_frets = self.frets("A", i, num)
-            self.A_frets.bind(on_press = partial(self.callback, num, "A"))
+            self.A_frets.bind(on_press = partial(self.frets_callback, num, "A"))
             self.A_string.add_widget(self.A_frets)
 
             self.D_frets = self.frets("D", i, num)
-            self.D_frets.bind(on_press = partial(self.callback, num, "D"))
+            self.D_frets.bind(on_press = partial(self.frets_callback, num, "D"))
             self.D_string.add_widget(self.D_frets)
 
             self.G_frets = self.frets("G", i, num)
-            self.G_frets.bind(on_press = partial(self.callback, num, "G"))
+            self.G_frets.bind(on_press = partial(self.frets_callback, num, "G"))
             self.G_string.add_widget(self.G_frets)      
          
         return self.window
-    
-    # def update(self, *args):
-    #     pass
-    
-    def callback(self, *args):     
+        
+    def frets_callback(self, *args):     
         string = args[1]
         fret_number = args[0]           
-        line_1 = f"string: {string} \nfret number: {fret_number}"
-        line_2 = f"sound name: {self.note_name(string, fret_number)}"
+        console_line_1 = f"string: {string} \nfret number: {fret_number}"
+        console_line_2 = f"sound name: {self.note_name(string, fret_number)}"
 
         if self.is_right(string, fret_number):
-            line_3 = f"GOOD"
-            self.score += 1
+            console_line_3 = f"GOOD"
+            self.round_score += 1     # dopisać logikę lepiej liczącą punkty. Wykorzystać round_score
         else:
-            line_3 = f"Not good..."
-            # self.score = 0    # old version 
-            self.game_over()    # NAPRAWIĆ: game over nie przerywa timera
+            console_line_3 = f"Not good..."            
+            self.game_over()    
             
-        line_4 = self.score
+        console_line_4 = self.score
+        console_line_5 = self.round_score
 
-        self.console_wgt.text = f"{line_2}\n{line_3}\n{line_4}"   
-        self.score_wgt.text = f"score: {self.score}"
+        self.console_wgt.text = f"{console_line_2}\n{console_line_3}\n{console_line_4}\nRound score: {console_line_5}"
+        self.score_wgt.text = f"score: {(self.score + self.round_score)}"
         # self.console.text = f"string {args[1]} \nfret number {args[0]}\nString E, fret 8: {self.note_name('e', 8)}"   
 
     def start_callback(self, *args):        
       
-        # self.question = self.random_sound()
-        # print(f"Sound to guess: {self.question}")
-        # self.sound_question_wgt.text = f"{self.question}"
-
-        # self.new_round()
         self.console_wgt.text = f"Start!"   
-        self.score = 0
-        # self.crudeclock.start(self.game_over, self.new_round)         # function passed to a child as an argument
-        self.counter.start(self.game_over, self.new_round)
-        # self.counter.opacity = 0
+        self.score = 0     
+
+        # self.counter.start(self.round_over, self.new_round)  # zamiast game over round_over
+        self.new_round()
 
         self.start_wgt.size_hint = (0, 0)
         self.start_wgt.opacity = 0
         self.start_wgt.disabled = True
         self.sound_question_wgt.size_hint = (1,1)
-        self.sound_question_wgt.opacity = 1
-               
+        self.sound_question_wgt.opacity = 1                       
 
-    def new_round(self):        
-        # wprowadzić do klasy atrybut przechowujący stan gry (runda trwa, albo nie). 
-        # jeśli runda nie trwa, to timer się wyłącza? (jak?)
-        # a fretboard pozostaje disabled
-        # ROZWIĄZANIE 1: przepisać klasę timera do głównego pliku i wykorzystać loop=True sprawdzany co odświeżenie timera
-
+    def new_round(self):          
+        print("Mastur: New round")      
+        self.counter.opacity = 1
+        self.fretboard.disabled = False
+        # self.round_score = 0
         self.question = self.random_sound()
         print(f"Sound to guess: {self.question}")
         self.sound_question_wgt.text = f"{self.question}"
-        # self.crudeclock.opacity = 1
-        self.counter.opacity = 1
-        self.fretboard.disabled = False
+        self.counter.start(self.round_over, self.new_round) 
+        
+        
+        # self.counter.opacity = 1
+        # self.fretboard.disabled = False,
+
+    def round_over(self):
+
+        ### BŁAD: jeśli jakiś dźwięk był odgadnięty, to game over jest o turę za późno
+
+        if self.round_score == 0:
+            self.game_over()
+        else:
+            self.score += self.round_score
+            self.round_score = 0
+            self.new_round()
 
     def game_over(self):
         
