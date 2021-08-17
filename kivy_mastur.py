@@ -12,13 +12,12 @@ from random import choice
 
 from simple_schedule_timer import SimpleTimer
 
-
-
 class Mastur(App):
 
-    sounds = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+    SOUNDS = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     score = 0
     round_score = 0
+    round_number = 0
     round_answers = []
     question = None     
 
@@ -176,6 +175,8 @@ class Mastur(App):
         console_line_1 = f"string: {string} \nfret number: {fret_number}"
         console_line_2 = f"sound name: {self.note_name(string, fret_number)}"
 
+        ### ADD MORE POINTS FOR HIGHER FRETS
+
         if self.is_right(string, fret_number):            
             if guess in self.round_answers:                
                 console_line_3 = "Try somewhere else!"
@@ -208,16 +209,17 @@ class Mastur(App):
         self.sound_question_wgt.size_hint = (1,1)
         self.sound_question_wgt.opacity = 1                       
 
-    def new_round(self):          
-        print("Mastur: New round")      
+    def new_round(self):   
+        self.round_number += 1       
+        print("Mastur: Round number ", self.round_number)   
         
         self.counter.opacity = 1
-        self.fretboard.disabled = False
-        # self.round_score = 0
+        self.fretboard.disabled = False        
+        
         self.question = self.random_sound()
         print(f"Mastur: Sound to guess: {self.question}")
         self.sound_question_wgt.text = f"{self.question}"
-        self.counter.start(self.round_over, self.new_round) 
+        self.counter.start(self.round_over, self.new_round, self.round_number) 
         
         
         # self.counter.opacity = 1
@@ -225,8 +227,7 @@ class Mastur(App):
 
     def round_over(self):
         print("Mastur: The round is over")
-
-        ### BŁAD: jeśli jakiś dźwięk był odgadnięty, to game over jest o turę za późno
+        
         ### add round counter, or progressively speed up rounds
 
         if self.round_score == 0:
@@ -253,6 +254,7 @@ class Mastur(App):
         self.start_wgt.disabled = False
         self.fretboard.disabled = True      
       
+        self.round_number = 0
         self.round_answers.clear()          # RESET
         self.counter.event.cancel()         # O ten działa super
 
@@ -286,7 +288,7 @@ class Mastur(App):
     def note_name(self, *args): # return a name of the sound assigned to a fret on the particular string
         string_name = str(args[0])
         fret = args[1]
-        sounds = self.sounds
+        sounds = self.SOUNDS
         if fret > 24:
             print("There are 24 frets!")        
         else:
@@ -315,7 +317,7 @@ class Mastur(App):
                 return "-"
 
     def random_sound(self):
-        return choice(self.sounds)
+        return choice(self.SOUNDS)
    
 
     def is_right(self, *args):        

@@ -14,6 +14,8 @@ class SimpleTimer(Label):
     round_counter = 0   # chyba niepotrzebne, skoro jest w start()
     stored_func_1 = None    # game over
     stored_func_2 = None    # new round
+    stored_arg = 1       # round number
+
 
     # stopped = False     # chyba niepotrzebne, skoro jest w start() i cancel()
     # round_number = 3      # how many rounds
@@ -25,15 +27,17 @@ class SimpleTimer(Label):
         if args:            
             self.stored_func_1 = args[0]    # game over
             self.stored_func_2 = args[1]    # new round
+            self.stored_arg = args[2]    # round number
         self.start_round()     
 
     def start_round(self):
         print("SimpleTimer: New round has started.")
+        print("SimpleTimer: Interval: ", self.interval())
         self.eta = self.round_length
         # if self.stored_func_2:  
         #     self.stored_func_2()    # stored new_round
         self.text = str(self.eta)
-        self.event = Clock.schedule_interval(self.timer, 1)
+        self.event = Clock.schedule_interval(self.timer, self.interval())
         print("SimpleTimer: ", str(self.eta))
 
     def stop(self, *args):   # zatrzymuje wykonywanie funkcji, ale nie Clock
@@ -41,6 +45,9 @@ class SimpleTimer(Label):
         self.event.cancel()     
         if self.stored_func_1:
             self.stored_func_1()
+    
+    def interval(self):
+        return 0.95 ** self.stored_arg
         
     def timer(self, dt):
         print("SimpleTimer: working...")

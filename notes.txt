@@ -1,37 +1,15 @@
-Threading timer() 
-za pomocą timer.cancel() można go zatrzymać i anulować wykonywanie akcji (tylko podczas czekania)
-^ można z tego spróbować zrobić timer, który można ubić.
-
-
-from threading import Timer
-
-def hello():
-    print("hello, world")
-
-t = Timer(30.0, hello)
-t.start()  # after 30 seconds, "hello, world" will be printed
-
-def pause():
-        t.cancel()
-        # pauseTime = time.time()	- coś innego, potrzebne do wznowienia timera
-
-
-
+0. Your best score: / Reset best score
+1. Coraz krótsze rundy
+2. Wyłączyć button wciśnięty w tej rundzie
+3. UI uporządkować
+4. Przycisk play?
 _________
 
 Przeliczyć wysokość elementów lewego panelu
-_________
-
-sekwencja działania:
-1. po otwarciu apki wielki przycisk PLAY (trójkącik) w miejscu dźwięku do odgadnięcia
-2. po wciśnięciu PLAY znika, a zamiast niego pojawia się dźwięk do odgadnięcia
-3. po game overze zamiast dźwięku znowu pojawia się PLAY
 
 _________
-- w jednej turze tylko raz można dostać punkt za zagranie dźwięku na jednej pozycji
-- za zagranie dźwięku w jednej turze na innej pozycji dodatkowe punkty
 
-_________
+
 #
 # 2. quiz do zgadywania w którym miejscu jest dźwięk 
 #    Np. pytanie: Gdzie jest E? Odp.: E0, A7, E12, D3
@@ -61,7 +39,23 @@ schemat:
 2. wyświetlić zmienną question jako różową nazwę dźwięku
 3. sprawdzić, czy naciśnięty próg jest zgodny ze zmienną question. 
 	Jeśli tak, to score +1
-#
+####
+
+To zrobiłem inaczej (za pomocą kivy.clock):
+Threading timer() 
+za pomocą timer.cancel() można go zatrzymać i anulować wykonywanie akcji (tylko podczas czekania)
+^ można z tego spróbować zrobić timer, który można ubić.
+####
+
+sekwencja działania:
+1. po otwarciu apki wielki przycisk PLAY (trójkącik) w miejscu dźwięku do odgadnięcia
+2. po wciśnięciu PLAY znika, a zamiast niego pojawia się dźwięk do odgadnięcia
+3. po game overze zamiast dźwięku znowu pojawia się PLAY
+#####
+- w jednej turze tylko raz można dostać punkt za zagranie dźwięku na jednej pozycji
+- za zagranie dźwięku w jednej turze na innej pozycji dodatkowe punkty
+#####
+
 
 
 FRET CALCULATOR:
