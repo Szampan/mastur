@@ -1,8 +1,28 @@
 0. Your best score: / Reset best score
-1. Coraz krótsze rundy
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+from os.path import join
+
+class MyApp(App):
+def build(self):
+    data_dir = getattr(self, 'user_data_dir')
+    store = JsonStore(join(data_dir, 'storage_file.json'))
+
+	ALBO
+
+from kivy import kivy_home_dir
+from os.path import join
+highscore = JsonStore(join(kivy_home_dir, 'highscore.json'))
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
 2. Wyłączyć button wciśnięty w tej rundzie
-3. UI uporządkować
+3. UI uporządkować (białe napisy, wysokości)
 4. Przycisk play?
+5. Clean code
+6. Rozdział na klasy??
+8. Dodać dźwięki (przynajmniem "Masturbass" na początku i dźwięki progów)
+
 _________
 
 Przeliczyć wysokość elementów lewego panelu
@@ -28,6 +48,10 @@ _________
 ####################
 ##### ZROBIONE #####
 ####################
+
+7. im wyższy próg, tym więcej punktów
+
+1. Coraz krótsze rundy - ok
 
 # 1. Gryf: 
 #    odległości między progami jako ułamek całości

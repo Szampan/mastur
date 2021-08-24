@@ -9,6 +9,8 @@ from kivy.core.window import Window     # to get resolution
 
 from functools import partial
 from random import choice
+from jsonstore import JsonStore
+from os.path import join
 
 from simple_schedule_timer import SimpleTimer
 
@@ -170,20 +172,25 @@ class Mastur(App):
     def frets_callback(self, *args):     
         string = args[1]
         fret_number = args[0]       
-        guess = (args[1], args[0])  
+        answer = (args[1], args[0])  
+        bonus = 1
         
         console_line_1 = f"string: {string} \nfret number: {fret_number}"
         console_line_2 = f"sound name: {self.note_name(string, fret_number)}"
 
-        ### ADD MORE POINTS FOR HIGHER FRETS
-
         if self.is_right(string, fret_number):            
-            if guess in self.round_answers:                
+            if answer in self.round_answers:                
                 console_line_3 = "Try somewhere else!"
             else:      
-                console_line_3 = f"GOOD"          
-                self.round_score += 2 ** len(self.round_answers)     # The score grows exponentially
-                self.round_answers.append(guess)
+                console_line_3 = f"GOOD"
+                if 7 < fret_number <= 15:
+                    print("Mastur: Bonus x5 for higher positions")    
+                    bonus = 5      
+                elif fret_number > 15:
+                    print("Mastur: Bonus x10 for higher positions")
+                    bonus = 10
+                self.round_score += (2 ** len(self.round_answers)) * bonus     # The score grows exponentially
+                self.round_answers.append(answer)
         else:
             console_line_3 = f"Not good..."            
             self.game_over()    
@@ -202,7 +209,8 @@ class Mastur(App):
 
         # self.counter.start(self.round_over, self.new_round)  # zamiast game over round_over
         self.new_round()
-
+        
+        self.score_wgt.text = f"score: 0"
         self.start_wgt.size_hint = (0, 0)
         self.start_wgt.opacity = 0
         self.start_wgt.disabled = True
@@ -244,6 +252,8 @@ class Mastur(App):
         
         self.console_wgt.text = f"Game over\nYour score: {self.score}"  
         print(f"Game over\nYour score: {self.score}")
+
+        self.check_highscore(self.score)
 
         self.sound_question_wgt.size_hint = (0,0)
         self.sound_question_wgt.opacity = 0     
@@ -316,9 +326,13 @@ class Mastur(App):
                 print(f"Error\nname: {string_name}\nfret: {fret}")
                 return "-"
 
-    def random_sound(self):
-        return choice(self.SOUNDS)
-   
+    def random_sound(self):        
+        while True:
+            print("Mastur: Generate new sound")
+            new_question = choice(self.SOUNDS)
+            if new_question != self.question:
+                break
+        return new_question   
 
     def is_right(self, *args):        
         string_name = args[0]
@@ -330,6 +344,32 @@ class Mastur(App):
         else:
             print("wrong")
             return False
+    
+    def check_highscore(self, current_score):
+        data_dir = getattr(self, 'user_data_dir')      
+        score_file = JsonStore(join(data_dir, 'mastur_hs.json'))        
+        ### Try this if directory problems on other platforms ###
+        # from kivy import kivy_home_dir          
+        # score_file = JsonStore(join(kivy_home_dir, 'highscore.json'))        
+        print(data_dir)
+
+        try: 
+            old_highscore = score_file.highscore                    
+            print("Score: Old highscore:", old_highscore)
+            if current_score > old_highscore:
+                score_file.highscore = current_score
+                print(f"Score: New highscore: {score_file.highscore}!")
+                self.score_wgt.text = f"new highscore: {score_file.highscore}!"
+            else:
+                self.score_wgt.text = f"score: {current_score} \nhighscore: {score_file.highscore}"
+        except:            
+            print("Score: Create highscore record")
+            score_file.highscore = current_score
+
+
+            
+               
+        
 
 
 # question = Mastur().random_sound()
