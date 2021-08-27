@@ -1,23 +1,10 @@
-0. Your best score: / Reset best score
+9. Po uporządkowaniu UI zrobić plik exe
 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-from os.path import join
-
-class MyApp(App):
-def build(self):
-    data_dir = getattr(self, 'user_data_dir')
-    store = JsonStore(join(data_dir, 'storage_file.json'))
-
-	ALBO
-
-from kivy import kivy_home_dir
-from os.path import join
-highscore = JsonStore(join(kivy_home_dir, 'highscore.json'))
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+0. Dopisać komunikat o highscore w widgecie score
+	Your best score: / Reset best score
 
 2. Wyłączyć button wciśnięty w tej rundzie
-3. UI uporządkować (białe napisy, wysokości)
+3. UI uporządkować (białe napisy, wysokości)	!!!
 4. Przycisk play?
 5. Clean code
 6. Rozdział na klasy??
@@ -48,6 +35,21 @@ _________
 ####################
 ##### ZROBIONE #####
 ####################
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+from os.path import join
+
+class MyApp(App):
+def build(self):
+    data_dir = getattr(self, 'user_data_dir')
+    store = JsonStore(join(data_dir, 'storage_file.json'))
+
+	ALBO
+
+from kivy import kivy_home_dir
+from os.path import join
+highscore = JsonStore(join(kivy_home_dir, 'highscore.json'))
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 7. im wyższy próg, tym więcej punktów
 

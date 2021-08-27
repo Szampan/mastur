@@ -7,10 +7,10 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.core.window import Window     # to get resolution
 
-from functools import partial
 from random import choice
-from jsonstore import JsonStore
 from os.path import join
+from functools import partial
+from jsonstore import JsonStore
 
 from simple_schedule_timer import SimpleTimer
 
@@ -191,15 +191,21 @@ class Mastur(App):
                     bonus = 10
                 self.round_score += (2 ** len(self.round_answers)) * bonus     # The score grows exponentially
                 self.round_answers.append(answer)
+            self.score_wgt.text = f"score: {(self.score + self.round_score)}"
         else:
-            console_line_3 = f"Not good..."            
+            console_line_3 = f"Not good..."     
+            print("Is_right: Bad answer")
             self.game_over()    
             
         console_line_4 = self.score
         console_line_5 = self.round_score
 
         self.console_wgt.text = f"{console_line_2}\n{console_line_3}\n{console_line_4}\nRound score: {console_line_5}"
-        self.score_wgt.text = f"score: {(self.score + self.round_score)}"
+        
+        #### TO TA LINIJKA BRUŹDZI I AKTUALIZUJE SCORE PO GAME OVERZE
+        # self.score_wgt.text = f"score: {(self.score + self.round_score)}"
+        ####    
+
         # self.console.text = f"string {args[1]} \nfret number {args[0]}\nString E, fret 8: {self.note_name('e', 8)}"   
 
     def start_callback(self, *args):        
@@ -236,7 +242,7 @@ class Mastur(App):
     def round_over(self):
         print("Mastur: The round is over")
         
-        ### add round counter, or progressively speed up rounds
+        ### add round counter
 
         if self.round_score == 0:
             print("Mastur: Game over (time's up)")
@@ -250,8 +256,9 @@ class Mastur(App):
 
     def game_over(self):
         
-        self.console_wgt.text = f"Game over\nYour score: {self.score}"  
-        print(f"Game over\nYour score: {self.score}")
+        # self.console_wgt.text = f"Game over\nYour score: {self.score}"  
+        # print(f"Game over\nYour score: {self.score}")
+
 
         self.check_highscore(self.score)
 
@@ -267,6 +274,8 @@ class Mastur(App):
         self.round_number = 0
         self.round_answers.clear()          # RESET
         self.counter.event.cancel()         # O ten działa super
+        # self.counter.stop()    
+
 
     def frets(self, *args):
         string = args[0]
@@ -337,12 +346,9 @@ class Mastur(App):
     def is_right(self, *args):        
         string_name = args[0]
         fret = args[1]
-        # self.q_test = args[2]
-        if self.note_name(string_name, fret) == self.question:        # do czego przypisać question?
-            print("ok!")
+        if self.note_name(string_name, fret) == self.question:        # do czego przypisać question?            
             return True
-        else:
-            print("wrong")
+        else:            
             return False
     
     def check_highscore(self, current_score):
@@ -351,17 +357,23 @@ class Mastur(App):
         ### Try this if directory problems on other platforms ###
         # from kivy import kivy_home_dir          
         # score_file = JsonStore(join(kivy_home_dir, 'highscore.json'))        
-        print(data_dir)
+        # print(data_dir)
 
-        try: 
-            old_highscore = score_file.highscore                    
-            print("Score: Old highscore:", old_highscore)
+        # jest jakiś błąd: po nieudanej odpowiedzi nie wyświetla się new highscore na score_wgt
+        # poprawna zmiana score_wgt jest tlyko po timeoucie
+
+
+        try:  
+            old_highscore = score_file.highscore      
             if current_score > old_highscore:
-                score_file.highscore = current_score
-                print(f"Score: New highscore: {score_file.highscore}!")
+                # breakpoint()
+                score_file.highscore = current_score                
                 self.score_wgt.text = f"new highscore: {score_file.highscore}!"
-            else:
+                print(f"Score:New highscore: {score_file.highscore}!")
+            else:          
+                # breakpoint()      
                 self.score_wgt.text = f"score: {current_score} \nhighscore: {score_file.highscore}"
+                print(f"score: {current_score} \nhighscore: {score_file.highscore}")
         except:            
             print("Score: Create highscore record")
             score_file.highscore = current_score
