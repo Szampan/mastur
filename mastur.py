@@ -1,96 +1,19 @@
-# Mastur v0.2
+# Mastur v0.3
 
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.image import Image
+from kivy.lang import Builder
+from kivy.clock import Clock
+
 from kivy.core.window import Window     # to get resolution
 
 from random import choice
 from os.path import join, abspath
 from functools import partial
 from jsonstore import JsonStore
-
-# from mastur_timer import SimpleTimer
-
-
-###########
-from kivy.lang import Builder
-from kivy.clock import Clock
-
-class SimpleTimer(Label):
-    round_length = 5        # ROUND DURATION [SECONDS]    
-    eta = round_length  # chyba niepotrzebne, skoro jest w start()
-    round_counter = 0   # chyba niepotrzebne, skoro jest w start()
-    stored_round_over = None    # round over
-    stored_new_round = None    # new round
-    stored_arg = 1       # round number
-
-
-    # stopped = False     # chyba niepotrzebne, skoro jest w start() i cancel()
-    # round_number = 3      # how many rounds
-
-    def start(self, *args):
-        self.stopped = False    # chyba niepotrzebne skoro jest cancel
-        # self.eta = self.round_length # hcyba niepotrzebne skoro jest w new_round
-
-        if args:            
-            self.stored_round_over = args[0]    # round over
-            self.stored_new_round = args[1]    # new round
-            self.stored_arg = args[2]    # round number
-        self.start_round()     
-
-    def start_round(self):
-        print("SimpleTimer: New round has started.")
-        print("SimpleTimer: Interval: ", self.interval())
-        self.eta = self.round_length
-        # if self.stored_func_2:  
-        #     self.stored_func_2()    # stored new_round
-        self.text = str(self.eta)
-        self.event = Clock.schedule_interval(self.timer, self.interval())
-        print("SimpleTimer: ", str(self.eta))
-
-    def stop(self, *args):   # zatrzymuje wykonywanie funkcji, ale nie Clock
-        self.stopped = True
-        self.event.cancel()     
-        if self.stored_round_over:
-            self.stored_round_over()
-    
-    def interval(self):
-        return 0.95 ** self.stored_arg
-        
-    def timer(self, dt):
-        print("SimpleTimer: working...")
-
-        if not self.stopped:
-            if self.eta != 0:            
-                self.eta -= 1
-                self.text = str(self.eta)
-                print("SimpleTimer: ", str(self.eta))
-            else:                
-                print("SimpleTimer: End of the round!")
-                self.stop()
-                # self.event.cancel()      
-        else:                                               # aborting timer
-            print("SimpleTimer: Stop timer")
-            if self.stored_round_over:
-                self.stored_round_over()
-            # self.event.cancel()
-                    
-Builder.load_string('''
-<SimpleTimer>
-    # text: str(round(self.a))
-    font_size: '150sp'
-    color: '#1A1A1A'
-    valign: 'middle' 
-    opacity: '1'
-''')
-
-
-
-###########
-
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -99,7 +22,6 @@ def resource_path(relative_path):
         base_path = sys._MEIPASS
     except Exception:
         base_path = abspath(".")
-
     return join(base_path, relative_path)
 
 class Mastur(App):
@@ -223,22 +145,20 @@ class Mastur(App):
         self.fretboard.add_widget(self.G_string)        
 
         # fret buttons inside of EADG strings widgets
-        for i in range(frets+1):
-            # num = i + 1 
-            num = i
-            self.E_frets = self.frets("E", i, num)
+        for num in range(frets+1):
+            self.E_frets = self.frets("E", num)
             self.E_frets.bind(on_press = partial(self.frets_callback, num, "E"))
             self.E_string.add_widget(self.E_frets)
 
-            self.A_frets = self.frets("A", i, num)
+            self.A_frets = self.frets("A", num)
             self.A_frets.bind(on_press = partial(self.frets_callback, num, "A"))
             self.A_string.add_widget(self.A_frets)
 
-            self.D_frets = self.frets("D", i, num)
+            self.D_frets = self.frets("D", num)
             self.D_frets.bind(on_press = partial(self.frets_callback, num, "D"))
             self.D_string.add_widget(self.D_frets)
 
-            self.G_frets = self.frets("G", i, num)
+            self.G_frets = self.frets("G", num)
             self.G_frets.bind(on_press = partial(self.frets_callback, num, "G"))
             self.G_string.add_widget(self.G_frets)      
          
@@ -337,9 +257,8 @@ class Mastur(App):
         self.counter.event.cancel()         # Works great
 
     def frets(self, *args):
-        string = args[0]
-        i = args[1]       
-        num = args[2]
+        string = args[0]        
+        num = args[1]
         fret_color = (2.5,0.3,1,1) if num !=0 else (0.3,0.3,0.3,1)  #                                   NA ZEWNĄTRZ?    
         
         f = 0.944                   # length of each subsequent fret       
@@ -359,7 +278,7 @@ class Mastur(App):
             text = (f'{symbol}'),
             background_color = (fret_color),            
             border = (5,5,5,5),
-            size_hint = (2, f**i) if num !=0 else (1,0.5)
+            size_hint = (2, f**num) if num !=0 else (1,0.5)
             )
         return btn
 
@@ -429,7 +348,63 @@ class Mastur(App):
                 print(f"score: {current_score} \nhighscore: {score_file.highscore}")
         except:            
             print("Score: Create highscore record")
-            score_file.highscore = current_score          
+            score_file.highscore = current_score      
+
+class SimpleTimer(Label):
+    round_length = 5            # round duration [SECONDS]    
+    stored_round_over = None    # round over
+    stored_new_round = None     # new round
+    stored_arg = 1              # round number
+
+    def start(self, *args):
+        self.stopped = False       
+        if args:            
+            self.stored_round_over = args[0]    # round over
+            self.stored_new_round = args[1]     # new round
+            self.stored_arg = args[2]           # round number
+        self.start_round()     
+
+    def start_round(self):
+        print("SimpleTimer: New round has started.")
+        print("SimpleTimer: Interval: ", self.interval())
+        self.eta = self.round_length
+        self.text = str(self.eta)
+        self.event = Clock.schedule_interval(self.timer, self.interval())
+        print("SimpleTimer: ", str(self.eta))
+
+    def stop(self, *args):  
+        self.stopped = True
+        self.event.cancel()     
+        if self.stored_round_over:
+            self.stored_round_over()
+    
+    def interval(self):
+        return 0.95 ** self.stored_arg
+        
+    def timer(self, dt):
+        print("SimpleTimer: working...")
+
+        if not self.stopped:
+            if self.eta != 0:            
+                self.eta -= 1
+                self.text = str(self.eta)
+                print("SimpleTimer: ", str(self.eta))
+            else:                
+                print("SimpleTimer: End of the round!")
+                self.stop() 
+        else:                                               # aborting timer
+            print("SimpleTimer: Stop timer")
+            if self.stored_round_over:
+                self.stored_round_over()
+                    
+Builder.load_string('''
+<SimpleTimer>
+    # text: str(round(self.a))
+    font_size: '150sp'
+    color: '#1A1A1A'
+    valign: 'middle' 
+    opacity: '1'
+''')    
                     
 
 if __name__ == "__main__":
