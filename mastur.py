@@ -16,6 +16,7 @@ from functools import partial
 from jsonstore import JsonStore
 
 def resource_path(relative_path):
+    import sys      # ???
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
@@ -37,6 +38,7 @@ class Mastur(App):
         Window.size = (350,700)       # mobile screen ratio moreless
         window_size = Window.size          
 
+        self.icon = resource_path("bass-key-128.ico")
         self.window = GridLayout()       
         self.window.cols = 2
 
