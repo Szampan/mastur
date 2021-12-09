@@ -1,7 +1,7 @@
 # MasturBass
 Bass fretboard training app project. Mastur your bass skills!
 
-Also my first Python + Kivy + pink app.
+It's also my first Python + Kivy + pink app.
 
 ## How does it work?
 
