@@ -1,4 +1,4 @@
-# Mastur v0.3
+# Mastur v0.3.1
 
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -16,7 +16,7 @@ from functools import partial
 from jsonstore import JsonStore
 
 def resource_path(relative_path):
-    import sys      # ???
+    import sys      
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
@@ -42,7 +42,7 @@ class Mastur(App):
         self.window = GridLayout()       
         self.window.cols = 2
 
-        # leftpanel widget         
+        # Leftpanel widget         
         self.leftpanel = GridLayout(
                                     rows=2,
                                     size_hint = (1,1),
@@ -56,7 +56,7 @@ class Mastur(App):
                         )                        
         self.leftpanel.add_widget(self.logo)
 
-        # content widget inside of leftpanel
+        # Content widget inside of leftpanel
         self.content = GridLayout(
                                 rows=5, 
                                 size_hint = (1,18),
@@ -64,8 +64,8 @@ class Mastur(App):
                                 )   
         self.leftpanel.add_widget(self.content)
 
+        # Console - not used, but stays just in case
         self.console_wgt = Label(
-                        # Console stays here just in case..
                         # text = f"Window size: {window_size}\nString E, fret 8: {self.note_name('E', 8)}",  
                         # text = f"{self.question}",  
                         valign = "top",
@@ -79,7 +79,8 @@ class Mastur(App):
                                 size_hint = (1,2)   
                                 )
 
-        self.sound_question_wgt = Label(           # SHOW AFTER START, HIDE WHEN GAME OVER
+        # Appears after start. Disappears when game over
+        self.sound_question_wgt = Label(           
                         text = f"{self.question}",  
                         valign = "middle",                      
                         font_size =  "65sp",
@@ -90,7 +91,8 @@ class Mastur(App):
                         )
         self.sound_question_wgt.bind(size=self.sound_question_wgt.setter('text_size')) 
 
-        self.start_wgt = Button(                    # HIDE AFTER START, SHOW WHEN GAME OVER
+        # Disappears after start. Appears when game over
+        self.start_wgt = Button(                    
                         text = "START",
                         background_color = (2.5,0.3,1,1)                        
                         )
@@ -108,17 +110,15 @@ class Mastur(App):
         self.score_wgt.bind(size=self.score_wgt.setter('text_size'))      
 
         self.content.add_widget(self.console_wgt)
-
         self.content.add_widget(self.start_and_sound_wgt)
 
         self.start_and_sound_wgt.add_widget(self.sound_question_wgt)
         self.start_and_sound_wgt.add_widget(self.start_wgt)    
 
         self.content.add_widget(self.counter)
-
         self.content.add_widget(self.score_wgt)
 
-        # fretboard widget
+        # Fretboard widget
         self.fretboard = GridLayout(
                         cols = 4,
                         size_hint = (0.6,1),
@@ -127,43 +127,42 @@ class Mastur(App):
         self.window.add_widget(self.fretboard)
 
         # EADG strings widgets inside of the fretboard widget        
-        frets = 24   
-
+        FRETS = 24   
+        
         self.E_string = GridLayout()
-        self.E_string.rows = frets+1       
+        self.E_string.rows = FRETS+1       
 
         self.A_string = GridLayout()
-        self.A_string.rows = frets+1
+        self.A_string.rows = FRETS+1
         
         self.D_string = GridLayout()
-        self.D_string.rows = frets+1
+        self.D_string.rows = FRETS+1
         
         self.G_string = GridLayout()
-        self.G_string.rows = frets+1
+        self.G_string.rows = FRETS+1
         
         self.fretboard.add_widget(self.E_string)
         self.fretboard.add_widget(self.A_string)
         self.fretboard.add_widget(self.D_string)
         self.fretboard.add_widget(self.G_string)        
 
-        # fret buttons inside of EADG strings widgets
-        for num in range(frets+1):
-            self.E_frets = self.frets("E", num)
-            self.E_frets.bind(on_press = partial(self.frets_callback, num, "E"))
+        # Fret buttons inside of EADG strings widgets
+        for fret_num in range(FRETS+1):
+            self.E_frets = self.create_fret_object(string="E", num=fret_num)
+            self.E_frets.bind(on_press = partial(self.frets_callback, fret_num, "E"))
             self.E_string.add_widget(self.E_frets)
 
-            self.A_frets = self.frets("A", num)
-            self.A_frets.bind(on_press = partial(self.frets_callback, num, "A"))
+            self.A_frets = self.create_fret_object(string="A", num=fret_num)
+            self.A_frets.bind(on_press = partial(self.frets_callback, fret_num, "A"))
             self.A_string.add_widget(self.A_frets)
 
-            self.D_frets = self.frets("D", num)
-            self.D_frets.bind(on_press = partial(self.frets_callback, num, "D"))
+            self.D_frets = self.create_fret_object(string="D", num=fret_num)
+            self.D_frets.bind(on_press = partial(self.frets_callback, fret_num, "D"))
             self.D_string.add_widget(self.D_frets)
 
-            self.G_frets = self.frets("G", num)
-            self.G_frets.bind(on_press = partial(self.frets_callback, num, "G"))
+            self.G_frets = self.create_fret_object(string="G", num=fret_num)
+            self.G_frets.bind(on_press = partial(self.frets_callback, fret_num, "G"))
             self.G_string.add_widget(self.G_frets)      
-         
         return self.window
         
     def frets_callback(self, *args):     
@@ -174,10 +173,8 @@ class Mastur(App):
 
         if self.is_right(string, fret_number):            
             if answer in self.round_answers:                
-                # console_line_3 = "Try somewhere else!"
                 pass
             else:      
-                # console_line_3 = f"GOOD"
                 if 7 < fret_number <= 15:
                     print("Mastur: Bonus x5 for higher positions")    
                     bonus = 5      
@@ -185,27 +182,18 @@ class Mastur(App):
                     print("Mastur: Bonus x10 for higher positions")
                     bonus = 10
                 self.round_score += (2 ** len(self.round_answers)) * bonus     # Not needed. Used only in print() messages
-                self.score += (2 ** len(self.round_answers)) * bonus     # The score grows exponentially
+                # The score grows exponentially
+                self.score += (2 ** len(self.round_answers)) * bonus     
                 self.round_answers.append(answer)
-            # self.score_wgt.text = f"score: {(self.score + self.round_score)}"
             self.score_wgt.text = f"score: {self.score}"
         else:
-            # console_line_3 = f"Not good..."     
             print("Is_right: Bad answer")
             self.game_over()    
-            
-        ### Console stuff stays here just in case    
-        # console_line_1 = f"string: {string} \nfret number: {fret_number}"
-        # console_line_2 = f"sound name: {self.note_name(string, fret_number)}"
-        # console_line_4 = self.score
-        # console_line_5 = self.round_score
-        # self.console_wgt.text = f"{console_line_2}\n{console_line_3}\n{console_line_4}\nRound score: {console_line_5}"
+       
         
     def start_callback(self, *args):        
-      
-        # self.console_wgt.text = f"Mastur: Start!"   
-        self.score = 0     # RESET
         
+        self.score = 0     # RESET
         self.new_round()
         
         self.score_wgt.text = f"score: 0"
@@ -222,7 +210,7 @@ class Mastur(App):
         self.counter.opacity = 1
         self.fretboard.disabled = False        
         
-        self.question = self.random_sound()
+        self.question = self.get_random_sound()
         print(f"Mastur: Sound to guess: {self.question}")
         self.sound_question_wgt.text = f"{self.question}"
         self.counter.start(self.round_over, self.new_round, self.round_number)       
@@ -243,7 +231,7 @@ class Mastur(App):
             self.new_round()
 
     def game_over(self):
-        self.check_highscore(self.score)
+        self.update_highscore(self.score)
 
         self.sound_question_wgt.size_hint = (0,0)
         self.sound_question_wgt.opacity = 0     
@@ -256,15 +244,11 @@ class Mastur(App):
       
         self.round_number = 0
         self.round_answers.clear()          # RESET
-        self.counter.event.cancel()         # Works great
+        self.counter.event.cancel()         
 
-    def frets(self, *args):
-        string = args[0]        
-        num = args[1]
-        fret_color = (2.5,0.3,1,1) if num !=0 else (0.3,0.3,0.3,1)  #                                   NA ZEWNĄTRZ?    
-        
-        f = 0.944                   # length of each subsequent fret       
-        
+    def create_fret_object(self, string, num):
+        FRET_COLOR = (2.5,0.3,1,1) if num !=0 else (0.3,0.3,0.3,1)          # outside?    
+        F = 0.944                   # length factor of each subsequent fret       
         symbol, symbol1, symbol2 = " " *3
         if num in (3, 5, 7, 9, 15, 17, 21) :
             symbol1 = "•"
@@ -276,15 +260,16 @@ class Mastur(App):
         elif string == "D":
             symbol = symbol2
 
-        btn = Button(                 
+        fret = Button(                 
             text = (f'{symbol}'),
-            background_color = (fret_color),            
+            background_color = (FRET_COLOR),            
             border = (5,5,5,5),
-            size_hint = (2, f**num) if num !=0 else (1,0.5)
+            size_hint = (2, F**num) if num !=0 else (1,0.5)
             )
-        return btn
+        return fret
 
-    def note_name(self, *args): # return a name of the sound assigned to a fret on the particular string
+    def get_note_name(self, *args):         # use keyword arguments instead of *args? Rebuild function  and function calling
+        """ Returns the name of the sound assigned to a given fret on a given string """
         string_name = str(args[0])
         fret = args[1]
         sounds = self.SOUNDS
@@ -315,7 +300,7 @@ class Mastur(App):
                 print(f"Error\nname: {string_name}\nfret: {fret}")
                 return "-"
 
-    def random_sound(self):        
+    def get_random_sound(self):        
         while True:
             print("Mastur: Generate new sound")
             new_question = choice(self.SOUNDS)
@@ -326,12 +311,12 @@ class Mastur(App):
     def is_right(self, *args):        
         string_name = args[0]
         fret = args[1]
-        if self.note_name(string_name, fret) == self.question:        # do czego przypisać question?            
+        if self.get_note_name(string_name, fret) == self.question:        # do czego przypisać question?            
             return True
         else:            
             return False
     
-    def check_highscore(self, current_score):
+    def update_highscore(self, current_score):
         data_dir = getattr(self, 'user_data_dir')      
         score_file = JsonStore(join(data_dir, 'mastur_hs.json'))        
         ### Try this if directory problems on other platforms ###
@@ -394,7 +379,8 @@ class SimpleTimer(Label):
             else:                
                 print("SimpleTimer: End of the round!")
                 self.stop() 
-        else:                                               # aborting timer
+        else:            
+            # Abort timer
             print("SimpleTimer: Stop timer")
             if self.stored_round_over:
                 self.stored_round_over()
