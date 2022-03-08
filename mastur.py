@@ -36,7 +36,7 @@ class Mastur(App):
 
     def build(self):     
         Window.size = (350,700)       # mobile screen ratio moreless
-        window_size = Window.size          
+        # window_size = Window.size          
 
         self.icon = resource_path("bass-key-128.ico")
         self.window = GridLayout()       
@@ -149,47 +149,53 @@ class Mastur(App):
         # Fret buttons inside of EADG strings widgets
         for fret_num in range(FRETS+1):
             self.E_frets = self.create_fret_object(string="E", num=fret_num)
-            self.E_frets.bind(on_press = partial(self.frets_callback, fret_num, "E"))
+            self.E_frets.bind(on_press = partial(self.frets_callback, fret_num=fret_num, string="E"))
+            # self.E_frets.bind(on_press = self.frets_callback(fret_num=fret_num, string="E"))
             self.E_string.add_widget(self.E_frets)
 
             self.A_frets = self.create_fret_object(string="A", num=fret_num)
-            self.A_frets.bind(on_press = partial(self.frets_callback, fret_num, "A"))
+            self.A_frets.bind(on_press = partial(self.frets_callback, fret_num=fret_num, string="A"))
             self.A_string.add_widget(self.A_frets)
 
             self.D_frets = self.create_fret_object(string="D", num=fret_num)
-            self.D_frets.bind(on_press = partial(self.frets_callback, fret_num, "D"))
+            self.D_frets.bind(on_press = partial(self.frets_callback, fret_num=fret_num, string="D"))
             self.D_string.add_widget(self.D_frets)
 
             self.G_frets = self.create_fret_object(string="G", num=fret_num)
-            self.G_frets.bind(on_press = partial(self.frets_callback, fret_num, "G"))
+            self.G_frets.bind(on_press = partial(self.frets_callback, fret_num=fret_num, string="G"))
             self.G_string.add_widget(self.G_frets)      
         return self.window
         
-    def frets_callback(self, *args):     
-        string = args[1]
-        fret_number = args[0]       
-        answer = (args[1], args[0])  
-        bonus = 1   
+    def frets_callback(self, *args, fret_num, string):     # Get rid of *args
+        answer = (string, fret_num)  
+        bonus_factor = self.get_bonus_factor(fret_num)   
 
-        if self.is_right(string, fret_number):            
+        if self.is_right(string, fret_num):            
             if answer in self.round_answers:                
                 pass
             else:      
-                if 7 < fret_number <= 15:
-                    print("Mastur: Bonus x5 for higher positions")    
-                    bonus = 5      
-                elif fret_number > 15:
-                    print("Mastur: Bonus x10 for higher positions")
-                    bonus = 10
-                self.round_score += (2 ** len(self.round_answers)) * bonus     # Not needed. Used only in print() messages
-                # The score grows exponentially
-                self.score += (2 ** len(self.round_answers)) * bonus     
+                # Score grows exponentially
+                self.round_score += (2 ** len(self.round_answers)) * bonus_factor    
+                self.score += self.round_score
                 self.round_answers.append(answer)
             self.score_wgt.text = f"score: {self.score}"
         else:
             print("Is_right: Bad answer")
             self.game_over()    
-       
+    
+    def get_bonus_factor(self, fret_number):
+        if 7 < fret_number <= 15:
+            print("Mastur: Bonus x5 for higher positions")    
+            bonus = 5      
+        elif fret_number > 15:
+            print("Mastur: Bonus x10 for higher positions")
+            bonus = 10
+        else:
+            bonus = 1
+        return bonus
+
+    # def count_round_score(fret_numer):
+
         
     def start_callback(self, *args):        
         
@@ -359,7 +365,7 @@ class SimpleTimer(Label):
         self.event = Clock.schedule_interval(self.timer, self.interval())
         print("SimpleTimer: ", str(self.eta))
 
-    def stop(self, *args):  
+    def stop(self):  
         self.stopped = True
         self.event.cancel()     
         if self.stored_round_over:
